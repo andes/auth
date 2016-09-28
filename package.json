@@ -1,0 +1,23 @@
+{
+  "name": "auth",
+  "version": "0.0.1",
+  "description": "Autenticación de usuarios",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Team Andes",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.15.2",
+    "events": "^1.1.1",
+    "express": "^4.14.0",
+    "require-dir": "^0.3.0",
+    "mongoose": "^4.6.1",
+    "passport": "^0.3.2",
+    "passport-http": "^0.3.0",
+    "require-dir": "^0.3.0",
+    "systemjs": "0.19.27"
+  }
+}
