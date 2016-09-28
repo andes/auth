@@ -6,8 +6,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Team Andes",
-  "license": "ISC",
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.15.2",
@@ -19,5 +17,11 @@
     "passport-http": "^0.3.0",
     "require-dir": "^0.3.0",
     "systemjs": "0.19.27"
-  }
+  },
+  "author": "Team Andes",
+  "license": "ISC",
+  "repository": {
+   "type": "git",
+   "url": "git+https://github.com/andes/auth.git"
+ },
 }
