@@ -1,50 +1,44 @@
-var express = require('express');
-var mongoose = require('mongoose');
-var bodyParser = require('body-parser');
-//var session = require('express-session');
+var express = require('express'),
+    path = require('path'),
+    mongoose = require('mongoose'),
+    passport = require('passport'),
+    bodyParser = require('body-parser'),
+    passportConfig = require('./passport'),
+    config = require('./config'),
+    routes = require('./routes/routes'),
+    fs = require('fs'),
+    swagger = require('swagger-jsdoc');
 
-var requireDir = require('require-dir');
-var passport = require('passport');
-var authRoutes = require('./routes/auth');
-var usrRoutes = require('./routes/usuario');
+// Connect to MongoDB
+mongoose.connect(config.mongo);
 
-// Conectamos a la base de datos
-mongoose.connect('mongodb://10.1.62.17/andes');
-
-// Se crea la aplicación Express
+// Express config
 var app = express();
-
-//Se usa el package body-parser en la aplicación
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
-  extended: true
+    extended: false
 }));
 
-// Usar soporte express session desde OAuth2orize
-// app.use(session({
-//   secret: 'Super Secret Session Key',
-//   saveUninitialized: true,
-//   resave: true
-// }));
-
-// Se usa el package passport en nuestra aplicación
+// Passport config
+passportConfig();
 app.use(passport.initialize());
 
-// Crear nuestro router Express
-//var router = express.Router();
-
-
-//***DESPUES SE CONFIGURARÍA DE LA MISMA FORMA LAS RUTAS DE LAS APIS
-app.use('/', authRoutes.autenticado, usrRoutes );   //Se configuran las rutas con autenticación
-
-//SE CONFIGURAN CON AUTENTICACIÓN
-//app.use('/', usrRoutes );   //Sin autenticación
-
-// var routes = requireDir('./routes/');
-// for (var route in routes)
-//     //app.use('/', authRoutes.autenticado, routes[route]);
-//       app.use('/apiAuth', routes[route]);
-
-app.listen(3000, function () {
-  console.log('App listening on port 3000!');
+// swagger docs
+// ... initialize swagger-jsdoc
+var swaggerSpec = swagger({
+  swaggerDefinition: {
+    basePath: '/auth'
+  },
+  apis: fs.readdirSync(path.join(__dirname, './routes/')).map(function(i){ return path.join(__dirname, './routes/') + i})
 });
+// ... routes
+app.get('/docs.json', function(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
+// Routes
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(routes);
+
+module.exports = app;
