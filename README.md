@@ -1,6 +1,15 @@
-# auth
-Implementa la autenticación de usuarios
+# Shared: código compartido para ANDES
+
+Shared es un conjunto código, librerías y servicios para el proyecto ANDES.
 
 
-Permite crear cuentas de usuarios.  
-Se utiliza Passport para realizar la implementación
+## Instalación
+```
+npm install @andes/shared --save
+```
+
+## Demo
+Ejecutar la aplicación con `ng serve` y navegar hasta `http://localhost:4200` 
+```
+ng serve
+```

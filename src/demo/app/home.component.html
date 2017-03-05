@@ -1,0 +1,36 @@
+<plex-box title="Login">
+    <h4 *ngIf="!auth.loggedIn()" class="text-danger">Sesión inactiva</h4>
+    <h4 *ngIf="auth.loggedIn()" class="text-success">Sesión activa</h4>
+    <plex-text label="Usuario" [(ngModel)]="usuario"></plex-text>
+    <plex-text label="Password" [(ngModel)]="password"></plex-text>
+    <plex-button label="Login" type="primary" (click)="login()"></plex-button>
+</plex-box>
+
+
+<plex-box title="Permisos" *ngIf="auth.loggedIn()">
+    <div *ngFor="let item of auth.permisos; let i = index">
+        <plex-text [(ngModel)]="auth.permisos[i]" (change)="actualizar()"></plex-text>
+    </div>
+</plex-box>
+
+<plex-box title="Chequeo dinámico con una expresión declarativa" *ngIf="auth.loggedIn()">
+    <plex-text label="Ingrese un id de impresora para chequear" [(ngModel)]="checkId"></plex-text>
+    <div class="row">
+        <div class="col-md-6">
+            <div *ngIf="auth.check('printer:' + checkId + ':print')" class="alert alert-success">
+                Usted tiene permisos para la operación <strong>print</strong>
+            </div>
+            <div *ngIf="!auth.check('printer:' + checkId + ':print')" class="alert alert-danger">
+                Usted no tiene permisos para la operación <strong>print</strong>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div *ngIf="auth.check('printer:' + checkId + ':read')" class="alert alert-success">
+                Usted tiene permisos para la operación <strong>read</strong>
+            </div>
+            <div *ngIf="!auth.check('printer:' + checkId + ':read')" class="alert alert-danger">
+                Usted no tiene permisos para la operación <strong>read</strong>
+            </div>
+        </div>
+    </div>
+</plex-box>
