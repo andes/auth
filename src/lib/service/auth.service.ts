@@ -3,8 +3,6 @@ import { Injectable } from '@angular/core';
 import { JwtHelper } from 'angular2-jwt';
 import { Estado } from './estado.enum';
 import { Server } from '@andes/shared';
-import { Usuario } from './usuario.interface';
-import { Organizacion } from './organizacion.interface';
 let shiroTrie = require('shiro-trie');
 
 @Injectable()
@@ -12,12 +10,17 @@ export class Auth {
     private jwtHelper = new JwtHelper();
     private shiro = shiroTrie.new();
     public estado: Estado;
-    public usuario: Usuario;
-    public organizacion: Organizacion;
+    public usuario: any;
+    public organizacion: any;
     public roles: string[];
     public permisos: string[];
 
     constructor(private server: Server) {
+        // Si hay token, inicia la sesión
+        let jwt = window.sessionStorage.getItem('jwt');
+        if (jwt) {
+            this.initFromToken(jwt);
+        }
     };
 
     private initShiro() {
@@ -49,14 +52,19 @@ export class Auth {
                 return false;
             }
         } catch (e) {
+            this.estado = Estado.inactivo;
             return false;
         }
     }
 
-    login(usuario: string, password: string): Observable<any> {
-        return this.server.post('http://localhost:3002/api/auth/login', { usuario: usuario, password: password }).do((data) => {
+    login(usuario: string, password: string, organizacion: string): Observable<any> {
+        return this.server.post('http://localhost:3002/api/auth/login', { usuario: usuario, password: password, organizacion: organizacion }, { params: null, showError: false }).do((data) => {
             this.initFromToken(data.token);
         });
+    }
+
+    organizaciones(): Observable<any> {
+        return this.server.get('http://localhost:3002/api/auth/organizaciones');
     }
 
     logout() {
