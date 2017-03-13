@@ -9,27 +9,30 @@
 
 <plex-box title="Permisos" *ngIf="auth.loggedIn()">
     <div *ngFor="let item of auth.permisos; let i = index">
-        <plex-text [(ngModel)]="auth.permisos[i]" (change)="actualizar()"></plex-text>
+        <pre>{{auth.permisos[i]}}</pre>
     </div>
 </plex-box>
 
-<plex-box title="Chequeo dinámico con una expresión declarativa" *ngIf="auth.loggedIn()">
-    <plex-text label="Ingrese un id de impresora para chequear" [(ngModel)]="checkId"></plex-text>
-    <div class="row">
-        <div class="col-md-6">
-            <div *ngIf="auth.check('printer:' + checkId + ':print')" class="alert alert-success">
-                Usted tiene permisos para la operación <strong>print</strong>
+<plex-box title="Chequeo dinámico" *ngIf="auth.loggedIn()">
+    <plex-text label="Ingrese un permiso para chequear" [(ngModel)]="inputCheck"></plex-text>
+    <div class="row" *ngIf="inputCheck">
+        <div class="col-md-12">
+            <div *ngIf="auth.check(inputCheck)" class="alert alert-success">
+                Usted tiene permisos para la operación
             </div>
-            <div *ngIf="!auth.check('printer:' + checkId + ':print')" class="alert alert-danger">
-                Usted no tiene permisos para la operación <strong>print</strong>
+            <div *ngIf="!auth.check(inputCheck)" class="alert alert-danger">
+                Usted no tiene permisos para la operación
             </div>
         </div>
-        <div class="col-md-6">
-            <div *ngIf="auth.check('printer:' + checkId + ':read')" class="alert alert-success">
-                Usted tiene permisos para la operación <strong>read</strong>
-            </div>
-            <div *ngIf="!auth.check('printer:' + checkId + ':read')" class="alert alert-danger">
-                Usted no tiene permisos para la operación <strong>read</strong>
+    </div>
+</plex-box>
+
+<plex-box title="Obtener permisos" *ngIf="auth.loggedIn()">
+    <plex-text label="Ingrese un permiso obtener (utilice los comodines $ y ?)" [(ngModel)]="inputPermissions" (change)="checkPermisos()"></plex-text>
+    <div class="row">
+        <div class="col-md-12">
+            <div *ngFor="let item of permisos; let i = index">
+                <pre>{{permisos[i]}}</pre>
             </div>
         </div>
     </div>

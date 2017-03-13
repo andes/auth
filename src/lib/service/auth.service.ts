@@ -12,8 +12,8 @@ export class Auth {
     public estado: Estado;
     public usuario: any;
     public organizacion: any;
-    public roles: string[];
-    public permisos: string[];
+    private roles: string[];
+    private permisos: string[];
 
     constructor(private server: Server) {
         // Si hay token, inicia la sesión
@@ -63,25 +63,28 @@ export class Auth {
         });
     }
 
-    organizaciones(): Observable<any> {
-        return this.server.get('http://localhost:3002/api/auth/organizaciones');
-    }
-
     logout() {
         this.estado = Estado.inactivo;
         this.usuario = null;
+        this.organizacion = null;
+        this.roles = null;
+        this.permisos = null;
         window.sessionStorage.removeItem('jwt');
+    }
+
+    organizaciones(): Observable<any> {
+        return this.server.get('http://localhost:3002/api/auth/organizaciones');
     }
 
     check(string: string): boolean {
         return this.shiro.check(string);
     }
 
-    loggedIn() {
-        return this.estado === Estado.activo;
+    getPermissions(string: string): string[] {
+        return this.shiro.permissions(string);
     }
 
-    actualizarPermisos() {
-        this.initShiro();
+    loggedIn() {
+        return this.estado === Estado.activo;
     }
 }
