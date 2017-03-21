@@ -1,6 +1,6 @@
 {
     "name": "@andes/auth",
-    "version": "0.0.5",
+    "version": "0.1.0",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/andes/auth.git"
@@ -16,8 +16,8 @@
         "e2e": "protractor"
     },
     "dependencies": {
-        "@andes/plex": "^0.9.1",
-        "@andes/shared": "^0.2.1",
+        "@andes/plex": "^1.0.0",
+        "@andes/shared": "^0.3.0",
         "@angular/common": "2.4.8",
         "@angular/compiler": "2.4.8",
         "@angular/core": "2.4.8",
