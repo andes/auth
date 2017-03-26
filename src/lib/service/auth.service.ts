@@ -58,7 +58,7 @@ export class Auth {
     }
 
     login(usuario: string, password: string, organizacion: string): Observable<any> {
-        return this.server.post(window.location.protocol + '//' + window.location.hostname + ':3002/api/auth/login', { usuario: usuario, password: password, organizacion: organizacion }, { params: null, showError: false }).do((data) => {
+        return this.server.post('/api/auth/login', { usuario: usuario, password: password, organizacion: organizacion }, { params: null, showError: false }).do((data) => {
             this.initFromToken(data.token);
         });
     }
@@ -73,7 +73,7 @@ export class Auth {
     }
 
     organizaciones(): Observable<any> {
-        return this.server.get(window.location.protocol + '//' + window.location.hostname + ':3002/api/auth/organizaciones');
+        return this.server.get('/auth/organizaciones');
     }
 
     check(string: string): boolean {
