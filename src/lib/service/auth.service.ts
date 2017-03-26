@@ -58,7 +58,7 @@ export class Auth {
     }
 
     login(usuario: string, password: string, organizacion: string): Observable<any> {
-        return this.server.post('/api/auth/login', { usuario: usuario, password: password, organizacion: organizacion }, { params: null, showError: false }).do((data) => {
+        return this.server.post('/auth/login', { usuario: usuario, password: password, organizacion: organizacion }, { params: null, showError: false }).do((data) => {
             this.initFromToken(data.token);
         });
     }
