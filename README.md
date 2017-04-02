@@ -1,11 +1,13 @@
-# Shared: código compartido para ANDES
+![ANDES](https://github.com/andes/andes.github.io/raw/master/images/logo.png)
 
-Shared es un conjunto código, librerías y servicios para el proyecto ANDES.
+# Auth
+
+Servicios de autenticación para ANDES
 
 
 ## Instalación
 ```
-npm install @andes/shared --save
+npm install @andes/auth --save
 ```
 
 ## Demo
