@@ -12,6 +12,7 @@ export class Auth {
     public estado: Estado;
     public usuario: any;
     public organizacion: any;
+    public profesional: any;
     private roles: string[];
     private permisos: string[];
 
@@ -44,6 +45,7 @@ export class Auth {
                 let payload = this.jwtHelper.decodeToken(token);
                 this.usuario = payload.usuario;
                 this.organizacion = payload.organizacion;
+                this.profesional = payload.profesional;
                 this.roles = payload.roles;
                 this.permisos = payload.permisos;
                 this.initShiro();
