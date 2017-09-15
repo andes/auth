@@ -13,6 +13,7 @@ export class Auth {
     public usuario: any;
     public organizacion: any;
     public profesional: any;
+    public orgs = [];
     private roles: string[];
     private permisos: string[];
 
@@ -59,8 +60,8 @@ export class Auth {
         }
     }
 
-    login(usuario: string, password: string, organizacion: string): Observable<any> {
-        return this.server.post('/auth/login', { usuario: usuario, password: password, organizacion: organizacion }, { params: null, showError: false }).do((data) => {
+    login(usuario: string, password: string): Observable<any> {
+        return this.server.post('/auth/login', { usuario: usuario, password: password }, { params: null, showError: false }).do((data) => {
             this.initFromToken(data.token);
         });
     }
@@ -74,10 +75,6 @@ export class Auth {
         window.sessionStorage.removeItem('jwt');
     }
 
-    organizaciones(): Observable<any> {
-        return this.server.get('/auth/organizaciones');
-    }
-
     check(string: string): boolean {
         return this.shiro.check(string);
     }
@@ -89,4 +86,17 @@ export class Auth {
     loggedIn() {
         return this.estado === Estado.activo;
     }
+
+    organizaciones(): Observable<any> {
+        return this.server.get('/auth/organizaciones').do((data) => {
+            this.orgs = data;
+        });
+    }
+    // modificaciones npm link
+    setOrganizacion(org: any): Observable<any> {
+        return this.server.post('/auth/organizaciones', { organizacion: org._id }).do((data) => {
+            this.initFromToken(data.token);
+        });
+    }
+
 }
