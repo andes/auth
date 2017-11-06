@@ -16,7 +16,7 @@ export class HomeComponent {
   }
 
   login() {
-    this.auth.login(this.usuario, this.password, '57e9670e52df311059bc8964').subscribe((data) => { });
+    this.auth.login(this.usuario, this.password).subscribe((data) => { });
   };
 
   checkPermisos() {

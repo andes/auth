@@ -1,5 +1,6 @@
 # Private
 config.js
+/dist
 
 # Logs
 logs
