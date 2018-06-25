@@ -1,13 +1,13 @@
 import { Observable } from 'rxjs/Rx';
 import { Injectable } from '@angular/core';
-import { JwtHelper } from 'angular2-jwt';
+import { JwtHelperService } from '@auth0/angular-jwt';
 import { Estado } from './estado.enum';
 import { Server } from '@andes/shared';
 let shiroTrie = require('shiro-trie');
 
 @Injectable()
 export class Auth {
-    private jwtHelper = new JwtHelper();
+    private jwtHelper = new JwtHelperService();
     private shiro = shiroTrie.new();
     public estado: Estado;
     public usuario: any;
