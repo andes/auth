@@ -18,10 +18,10 @@
   },
   "main": "./dist/index.js",
   "dependencies": {
-    "angular2-jwt": "^0.2.3",
+    "@auth0/angular-jwt": "^2.0.0",
     "shiro-trie": "0.4.6"
   },
-  "perrDependencies": {
+  "peerDependencies": {
     "@andes/plex": ">= 3.1.0",
     "@andes/share": ">= 3.0.0",
     "@angular/animations": ">=5.0.0",
