@@ -60,6 +60,10 @@ export class Auth {
         }
     }
 
+    getToken() {
+        return window.sessionStorage.getItem('jwt');
+    }
+
     login(usuario: string, password: string): Observable<any> {
         return this.server.post('/auth/login', { usuario: usuario, password: password }, { params: null, showError: false }).do((data) => {
             this.initFromToken(data.token);
@@ -92,7 +96,7 @@ export class Auth {
             this.orgs = data;
         });
     }
-    // modificaciones npm link
+
     setOrganizacion(org: any): Observable<any> {
         return this.server.post('/auth/organizaciones', { organizacion: org._id }).do((data) => {
             this.initFromToken(data.token);
