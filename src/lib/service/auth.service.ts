@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Estado } from './estado.enum';
 import { Server } from '@andes/shared';
+import { tap } from 'rxjs/operators';
 let shiroTrie = require('shiro-trie');
 
 @Injectable()
@@ -65,9 +66,11 @@ export class Auth {
     }
 
     login(usuario: string, password: string): Observable<any> {
-        return this.server.post('/auth/login', { usuario: usuario, password: password }, { params: null, showError: false }).do((data) => {
-            this.initFromToken(data.token);
-        });
+        return this.server.post('/auth/login', { usuario: usuario, password: password }, { params: null, showError: false }).pipe(
+            tap((data) => {
+                this.initFromToken(data.token);
+            })
+        );
     }
 
     logout() {
@@ -92,15 +95,19 @@ export class Auth {
     }
 
     organizaciones(): Observable<any> {
-        return this.server.get('/auth/organizaciones').do((data) => {
-            this.orgs = data;
-        });
+        return this.server.get('/auth/organizaciones').pipe(
+            tap((data) => {
+                this.orgs = data;
+            })
+        );
     }
 
     setOrganizacion(org: any): Observable<any> {
-        return this.server.post('/auth/organizaciones', { organizacion: org._id }).do((data) => {
-            this.initFromToken(data.token);
-        });
+        return this.server.post('/auth/organizaciones', { organizacion: org._id }).pipe(
+            tap((data) => {
+                this.initFromToken(data.token);
+            })
+        );
     }
 
 }
