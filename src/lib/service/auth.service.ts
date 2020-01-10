@@ -16,6 +16,7 @@ interface IUsuario {
     apellido: string;
     documento: string;
     nombreCompleto: string;
+    username: string;
 }
 
 @Injectable()
