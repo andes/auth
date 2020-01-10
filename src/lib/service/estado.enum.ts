@@ -1,1 +1,1 @@
-export enum Estado { inactivo, activo, bloqueado };
+export enum Estado { inProgress, active, logout };

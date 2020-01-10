@@ -1,84 +1,67 @@
 import { Observable } from 'rxjs/Rx';
 import { Injectable } from '@angular/core';
-import { JwtHelperService } from '@auth0/angular-jwt';
 import { Estado } from './estado.enum';
 import { Server } from '@andes/shared';
-import { tap } from 'rxjs/operators';
-let shiroTrie = require('shiro-trie');
+import { tap, publishReplay, refCount } from 'rxjs/operators';
+const shiroTrie = require('shiro-trie');
+
+interface IOrganizacion {
+    id: string;
+    nombre: string;
+}
+
+interface IUsuario {
+    id: string;
+    nombre: string;
+    apellido: string;
+    documento: string;
+    nombreCompleto: string;
+}
 
 @Injectable()
 export class Auth {
-    private jwtHelper = new JwtHelperService();
     private shiro = shiroTrie.new();
     public estado: Estado;
-    public usuario: any;
-    public organizacion: any;
-    public profesional: any;
+    public usuario: IUsuario;
+    public organizacion: IOrganizacion;
+    public profesional: string;
     public orgs = [];
     private roles: string[];
     private permisos: string[];
 
-    constructor(private server: Server) {
-        // Si hay token, inicia la sesión
-        let jwt = window.sessionStorage.getItem('jwt');
-        if (jwt) {
-            this.initFromToken(jwt);
-        }
-    };
+    private session$: Observable<any>;
+
+    constructor(private server: Server) { };
 
     private initShiro() {
         this.shiro.reset();
         this.shiro.add(this.permisos);
     }
 
-    private initFromToken(token: string): boolean {
-        this.logout();
-        if (!token) {
-            return false;
-        };
-
-        try {
-            if (!this.jwtHelper.isTokenExpired(token)) {
-                // Login OK
-                this.estado = Estado.activo;
-                // Guarda el token para futura referencia
-                window.sessionStorage.setItem('jwt', token);
-                // Obtiene datos del usuario y permisos desde el token
-                let payload = this.jwtHelper.decodeToken(token);
-                this.usuario = payload.usuario;
-                this.organizacion = payload.organizacion;
-                this.profesional = payload.profesional;
-                this.roles = payload.roles;
-                this.permisos = payload.permisos;
-                this.initShiro();
-                return true;
-            } else {
-                return false;
-            }
-        } catch (e) {
-            this.estado = Estado.inactivo;
-            return false;
-        }
-    }
-
     getToken() {
         return window.sessionStorage.getItem('jwt');
+    }
+
+    setToken(token: string) {
+        window.sessionStorage.setItem('jwt', token);
     }
 
     login(usuario: string, password: string): Observable<any> {
         return this.server.post('/auth/login', { usuario: usuario, password: password }, { params: null, showError: false }).pipe(
             tap((data) => {
-                this.initFromToken(data.token);
+                this.setToken(data.token);
+                this.estado = Estado.inProgress;
             })
         );
     }
 
     logout() {
-        this.estado = Estado.inactivo;
+        this.estado = Estado.logout;
         this.usuario = null;
         this.organizacion = null;
         this.roles = null;
         this.permisos = null;
+        this.session$ = null;
         window.sessionStorage.removeItem('jwt');
     }
 
@@ -91,7 +74,28 @@ export class Auth {
     }
 
     loggedIn() {
-        return this.estado === Estado.activo;
+        return this.estado === Estado.active;
+    }
+
+    inProgress() {
+        return this.estado === Estado.inProgress;
+    }
+
+    session() {
+        if (!this.session$) {
+            this.session$ = this.server.get('/auth/sesion').pipe(
+                tap((payload) => {
+                    this.usuario = payload.usuario;
+                    this.organizacion = payload.organizacion;
+                    this.profesional = payload.profesional;
+                    this.permisos = payload.permisos;
+                    this.initShiro();
+                }),
+                publishReplay(1),
+                refCount()
+            );
+        }
+        return this.session$;
     }
 
     organizaciones(): Observable<any> {
@@ -103,11 +107,14 @@ export class Auth {
     }
 
     setOrganizacion(org: any): Observable<any> {
-        return this.server.post('/auth/organizaciones', { organizacion: org._id }).pipe(
+        return this.server.post('/auth/v2/organizaciones', { organizacion: org._id }).pipe(
             tap((data) => {
-                this.initFromToken(data.token);
+                this.setToken(data.token);
+                this.estado = Estado.active;
             })
         );
     }
+
+
 
 }
