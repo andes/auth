@@ -94,6 +94,7 @@ export class Auth {
                     this.organizacion = payload.organizacion;
                     this.profesional = payload.profesional;
                     this.permisos = payload.permisos;
+                    this.estado = Estado.active;
                     this.initShiro();
                 }),
                 publishReplay(1),
