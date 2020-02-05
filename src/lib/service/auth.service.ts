@@ -82,8 +82,12 @@ export class Auth {
         return this.estado === Estado.inProgress;
     }
 
-    session() {
-        if (!this.session$) {
+    /**
+     *
+     * @param force Fuerza la busqueda de los datos de session. Default: false
+     */
+    session(force = false) {
+        if (!this.session$ || force) {
             this.session$ = this.server.get('/auth/sesion').pipe(
                 tap((payload) => {
                     this.usuario = payload.usuario;
