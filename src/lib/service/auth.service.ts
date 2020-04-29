@@ -1,8 +1,8 @@
-import { Observable } from 'rxjs/Rx';
+import { Observable, Subject } from 'rxjs/Rx';
 import { Injectable } from '@angular/core';
 import { Estado } from './estado.enum';
 import { Server } from '@andes/shared';
-import { tap, publishReplay, refCount } from 'rxjs/operators';
+import { tap, publishReplay, refCount, switchMap, filter, startWith } from 'rxjs/operators';
 const shiroTrie = require('shiro-trie');
 
 interface IOrganizacion {
@@ -19,20 +19,53 @@ interface IUsuario {
     username: string;
 }
 
+export interface ISession {
+    id: string;
+    account_id: string;
+    organizacion: IOrganizacion;
+    permisos: string[];
+    profesional: string;
+    type: string;
+    feature: {
+        [key: string]: any
+    };
+    usuario: IUsuario;
+}
+
+
 @Injectable()
 export class Auth {
+    private token$ = new Subject<string>();
+    private session$: Observable<ISession>;
+
     private shiro = shiroTrie.new();
     public estado: Estado;
     public usuario: IUsuario;
     public organizacion: IOrganizacion;
     public profesional: string;
     public orgs = [];
-    private roles: string[];
     private permisos: string[];
 
-    private session$: Observable<any>;
 
-    constructor(private server: Server) { };
+    constructor(private server: Server) {
+
+        this.session$ = this.token$.pipe(
+            switchMap(() => {
+                return this.server.get('/auth/sesion');
+            }),
+            tap((payload: any) => {
+                this.usuario = payload.usuario;
+                this.organizacion = payload.organizacion;
+                this.profesional = payload.profesional;
+                this.permisos = payload.permisos;
+                this.estado = Estado.active;
+                this.initShiro();
+            }),
+            publishReplay(1),
+            refCount()
+        );
+
+    };
 
     private initShiro() {
         this.shiro.reset();
@@ -45,12 +78,15 @@ export class Auth {
 
     setToken(token: string) {
         window.sessionStorage.setItem('jwt', token);
+        this.token$.next(token);
     }
+
 
     login(usuario: string, password: string): Observable<any> {
         return this.server.post('/auth/login', { usuario: usuario, password: password }, { params: null, showError: false }).pipe(
             tap((data) => {
-                this.setToken(data.token);
+                // this.setToken(data.token);
+                window.sessionStorage.setItem('jwt', data.token);
                 this.estado = Estado.inProgress;
             })
         );
@@ -60,9 +96,7 @@ export class Auth {
         this.estado = Estado.logout;
         this.usuario = null;
         this.organizacion = null;
-        this.roles = null;
         this.permisos = null;
-        this.session$ = null;
         window.sessionStorage.removeItem('jwt');
     }
 
@@ -82,25 +116,7 @@ export class Auth {
         return this.estado === Estado.inProgress;
     }
 
-    /**
-     *
-     * @param force Fuerza la busqueda de los datos de session. Default: false
-     */
-    session(force = false) {
-        if (!this.session$ || force) {
-            this.session$ = this.server.get('/auth/sesion').pipe(
-                tap((payload) => {
-                    this.usuario = payload.usuario;
-                    this.organizacion = payload.organizacion;
-                    this.profesional = payload.profesional;
-                    this.permisos = payload.permisos;
-                    this.estado = Estado.active;
-                    this.initShiro();
-                }),
-                publishReplay(1),
-                refCount()
-            );
-        }
+    session() {
         return this.session$;
     }
 
@@ -115,8 +131,8 @@ export class Auth {
     setOrganizacion(org: any): Observable<any> {
         return this.server.post('/auth/v2/organizaciones', { organizacion: org._id }).pipe(
             tap((data) => {
+                // this.estado = Estado.active;
                 this.setToken(data.token);
-                this.estado = Estado.active;
             })
         );
     }
